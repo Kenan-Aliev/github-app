@@ -1,41 +1,29 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { Route, useParams } from 'react-router-dom'
-import axios from 'axios'
+import { useDispatch } from 'react-redux'
 import Header from './header'
 import ReadMe from './readMe'
+import RepoList from './repolist'
+import { getRepolist } from '../redux/reducers/repoList'
+import { getAvatar } from '../redux/reducers/avatar'
+import { getReadme } from '../redux/reducers/readMe'
 
 const Home = () => {
-  const [repoList, setRepoList] = useState([])
-  const [readMe, setReadMe] = useState('')
-  console.log (readMe)
+  const dispatch = useDispatch()
   const { userName, repositoryName } = useParams()
-  const [avatar, setAvatar] = useState([])
   useEffect(() => {
     if (repositoryName) {
-      axios(`https://api.github.com/repos/${userName}/${repositoryName}/readme`, {
-        headers: { Accept: 'application/vnd.github.VERSION.raw' }
-      }).then(({ data }) => setReadMe(data))
+      dispatch(getReadme(userName, repositoryName))
     }
-    axios(`https://api.github.com/users/${userName}`).then(({ data }) => setAvatar(data))
-    axios(`https://api.github.com/users/${userName}/repos`).then(({ data }) => setRepoList(data))
+    dispatch(getRepolist(userName))
+    dispatch(getAvatar(userName))
   }, [userName])
   return (
     <div>
-      <Header
-        avatar={avatar}
-        userName={userName}
-        repositoryName={repositoryName}
-        repoList={repoList}
-      />
-      <Route
-        exact
-        path="/:userName/:repositoryName"
-        component={() => <ReadMe readMe={readMe} />}
-      />
+      <Header />
+      <Route exact path="/:userName" component={() => <RepoList />} />
+      <Route exact path="/:userName/:repositoryName" component={() => <ReadMe />} />
     </div>
   )
 }
-
-Home.propTypes = {}
-
 export default Home

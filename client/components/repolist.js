@@ -1,7 +1,14 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
-const RepoList = ({ userName, repos }) => {
+const RepoList = () => {
+  const { userName } = useParams()
+  console.log(userName)
+  const searchRepo = useSelector((s) => s.searchrepo.searchrepo)
+  const repolist = useSelector((s) => s.repoList.repoList)
+  const repos = repolist.filter((repo) => repo.name.includes(searchRepo))
+  console.log(repos)
   return (
     <div className="bg-pink-900 flex flex-wrap ">
       {repos.map((repo) => {
